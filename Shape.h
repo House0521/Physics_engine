@@ -29,7 +29,10 @@ public:
 	sf::Vector2f get_pos();
 	sf::Vector2f get_v();
 	sf::Vector2f get_a();
+	sf::Vector2f get_com();
 	sf::Color get_color();
+	float get_e();
+	float get_mass();
 
 	//interacting
 	void apply_force(sf::Vector2f f);

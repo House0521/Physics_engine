@@ -1,14 +1,14 @@
 #include "Engine.h"
 #include <string>
 #include <iostream>
-#include "circle_collision.h"
+#include "collision.h"
 #include "my_math.h"
 
 //Pricate finctions
 void Engine::init_vars() {
 	this->window = nullptr;
 
-	this->framerate = 1000;
+	this->framerate = 60;
 	this->dt = float(1) / framerate;
 	this->timer = 0;
 
@@ -92,7 +92,8 @@ void Engine::update() {
 	cir_2->set_a(0, 0);
 	if (cir_if_col(*cir, *cir_2)) {
 		cir_2->set_color(sf::Color::Red);
-		cir_collide(*cir, *cir_2);
+		//cir_collide(*cir, *cir_2);
+		collide(*cir, *cir_2, sfv::unitv(cir_2->get_pos() - cir->get_pos()));
 	}
 	else
 		cir_2->set_color(sf::Color::Green);
@@ -117,7 +118,7 @@ void Engine::render() {
 	//draw object
 	this->window->draw(cir->body());
 	this->window->draw(cir_2->body());
-	this->window->draw(tri->body());
+	//this->window->draw(tri->body());
 
 	//draw text
 	std::string s;

@@ -4,7 +4,7 @@
 
 //Cons / Decons
 Shape::Shape()
-	: _mass(1), _e(1), _pos(sf::Vector2f(0, 0)), _v(sf::Vector2f(0, 0)), _a(sf::Vector2f(0, 0)), _color(sf::Color::Cyan)
+	: _mass(1.f), _e(1), _pos(sf::Vector2f(0.f, 0.f)), _v(sf::Vector2f(0.f, 0.f)), _a(sf::Vector2f(0.f, 0.f)), _color(sf::Color::Cyan)
 {
 
 }
@@ -51,8 +51,17 @@ sf::Vector2f Shape::get_v() {
 sf::Vector2f Shape::get_a() {
 	return this->_a;
 }
+sf::Vector2f Shape::get_com() {
+	return this->_com;
+}
 sf::Color Shape::get_color() {
 	return this->_color;
+}
+float Shape::get_e() {
+	return this->_e;
+}
+float Shape::get_mass() {
+	return this->_mass;
 }
 
 //interacting
