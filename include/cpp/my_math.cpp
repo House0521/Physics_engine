@@ -40,10 +40,20 @@ namespace sfv {
 		return sf::Vector2f(-s * v.y, s * v.x);
 	}
 
+	sf::Vector2f projection_v(const sf::Vector2f& vec, const sf::Vector2f& axis) {	// project vec on axis, returning the vector
+		return sfv::dot(vec, axis) * sfv::unitv(axis);
+	}
+	float        projection_f(const sf::Vector2f& vec, const sf::Vector2f& axis) {	// project vec on axis, returning the length
+		return sfv::dot(vec, axis) / sfv::abs(axis);
+	}
+
+
 	//linear transformation
 	sf::Vector2f rotate(const sf::Vector2f& v, float theta) {	// using roatation matrix
 		return sf::Vector2f(v.x * cos(theta) - v.y * sin(theta), v.x * sin(theta) + v.y * cos(theta));
 	}
+
+
 
 	//about polygon
 	sf::Vector2f com_of_polygon(std::vector<sf::Vector2f> point_pos) {

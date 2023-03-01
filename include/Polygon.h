@@ -25,6 +25,8 @@ public:
 
 	//access
 	sf::ConvexShape body();
+	int get_point_count();
+	const std::vector<sf::Vector2f>& get_point_pos();
 
 	//draw
 	void draw();

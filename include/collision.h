@@ -7,7 +7,7 @@
 
 // collision detection
 bool if_collide(Circle& a, Circle& b);	// circle against circle
-bool if_collide(Polygon& a, Polygon& b);	//using GJK
+bool if_collide(Polygon& a, Polygon& b);	//using SAT
 
 // collision response
 void cir_collide(Circle& a, Circle& b);	// only for circle, using spring method

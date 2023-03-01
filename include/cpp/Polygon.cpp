@@ -24,6 +24,14 @@ sf::ConvexShape Polygon::body() {
 	return _polygon;
 }
 
+int Polygon::get_point_count() {
+	return this->_point_count;
+}
+
+const std::vector<sf::Vector2f>& Polygon::get_point_pos() {
+	return this->_point_pos;
+}
+
 //draw
 void Polygon::draw() {
 	_polygon.setPosition(_pos);

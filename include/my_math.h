@@ -16,6 +16,9 @@ namespace sfv {
 	sf::Vector2f cross(const sf::Vector2f& v, float s);
 	sf::Vector2f cross(float s, const sf::Vector2f& v);
 
+	sf::Vector2f projection_v(const sf::Vector2f& vec, const sf::Vector2f& axis);	// project vec on axis, returning the vector
+	float        projection_f(const sf::Vector2f& vec, const sf::Vector2f& axis);	// project vec on axis, returning the length
+
 	//linear trandformation
 	sf::Vector2f rotate(const sf::Vector2f& v, float theta);
 
