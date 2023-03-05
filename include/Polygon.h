@@ -16,7 +16,7 @@
 class Polygon : public Shape {
 private:
 	int _point_count;
-	std::vector<sf::Vector2f> _point_pos;
+	std::vector<sf::Vector2f> _rel_point_pos;	//points' positions relative to the com
 	sf::ConvexShape _polygon;
 
 public:
@@ -26,10 +26,10 @@ public:
 	//access
 	sf::ConvexShape body();
 	int get_point_count();
-	const std::vector<sf::Vector2f>& get_point_pos();
+	std::vector<sf::Vector2f> get_point_pos();
 
 	//draw
-	void draw();
+	void update();
 
 };
 

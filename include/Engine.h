@@ -36,8 +36,10 @@ private:
 	void init_texts();
 
 	//Objects
-	Circle* cir, *cir_2;
-	Polygon* tri;
+	//Circle* cir, *cir_2;
+	//Polygon* tri;
+	Polygon *pa, *pb;
+	std::vector<Circle> objs;
 
 	//Text
 	sf::Text cir_pos_text;
@@ -55,6 +57,10 @@ public:
 	void poll_events();
 	void update();
 	void render();
+
+	//Creaters
+	template <class T>
+	bool create();
 };
 
 

@@ -16,7 +16,7 @@ namespace sfv {
 	}
 
 	sf::Vector2f normalv(const sf::Vector2f& vec) {	// the abs of normal is the same as vec
-		return sf::Vector2f(-vec.x, vec.y);
+		return sf::Vector2f(-vec.y, vec.x);
 	}
 
 	float dot(const sf::Vector2f& u, const sf::Vector2f& v) {
@@ -40,8 +40,9 @@ namespace sfv {
 		return sf::Vector2f(-s * v.y, s * v.x);
 	}
 
+
 	sf::Vector2f projection_v(const sf::Vector2f& vec, const sf::Vector2f& axis) {	// project vec on axis, returning the vector
-		return sfv::dot(vec, axis) * sfv::unitv(axis);
+		return sfv::dot(vec, axis) / sfv::abs(axis) * sfv::unitv(axis);
 	}
 	float        projection_f(const sf::Vector2f& vec, const sf::Vector2f& axis) {	// project vec on axis, returning the length
 		return sfv::dot(vec, axis) / sfv::abs(axis);

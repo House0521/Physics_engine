@@ -25,6 +25,7 @@ void Engine::init_window() {
 }
 
 void Engine::init_objs() {
+	/*
 	cir = new Circle;
 	cir->set_pos(sf::Vector2f(30, 30));
 	cir->set_v(sf::Vector2f(50, 0));
@@ -38,6 +39,20 @@ void Engine::init_objs() {
 	points.push_back(sf::Vector2f(80.0, 70.0));
 	points.push_back(sf::Vector2f(100.0, 100.0));
 	tri = new Polygon(points);
+	*/
+	std::vector<sf::Vector2f> points;
+	points.push_back(sf::Vector2f(30.0, 40.0));
+	points.push_back(sf::Vector2f(130.0, 140.0));
+	points.push_back(sf::Vector2f(80.0, 200.0));
+	pa = new Polygon(points);
+	std::vector<sf::Vector2f> pointss;
+	pointss.push_back(sf::Vector2f(0.f, 0.f));
+	pointss.push_back(sf::Vector2f(100.f, 0.f));
+	pointss.push_back(sf::Vector2f(150.f, 50.f));
+	pointss.push_back(sf::Vector2f(130.f, 100.f));
+	pointss.push_back(sf::Vector2f(90.f, 100.f));
+	pointss.push_back(sf::Vector2f(30.f, 40.f));
+	pb = new Polygon(pointss);
 }
 
 void Engine::init_texts() {
@@ -62,9 +77,13 @@ Engine::Engine() {
 
 Engine::~Engine() {
 	delete this->window;
+	delete this->pa;
+	//delete this->pb;
+	/*
 	delete this->cir;
 	delete this->cir_2;
 	delete this->tri;
+	*/
 }
 
 //Accessors
@@ -85,13 +104,40 @@ void Engine::poll_events() {
 			break;
 		}
 	}
+	
 }
 
 void Engine::update() {
 	this->poll_events();
 
-	cir->set_a(0, 0);
-	cir_2->set_a(0, 0);
+	//mouse
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		pb->set_pos(pb->get_pos() - sf::Vector2f(10, 10));
+	pb->set_pos(sf::Vector2f(sf::Mouse::getPosition()));
+
+	// checking collision
+	/*
+	for (auto it_1 = objs.begin(); it_1 != objs.end(); it_1++) {
+		for (auto it_2 = objs.begin(); it_2 != objs.end(); it_2++) {
+			if (it_2 <= it_1)	continue;
+			if (if_collide(*it_1, *it_2)) {
+
+			}
+		}
+	}
+	*/
+	
+	
+	if (if_collide(*pa, *pb)) {
+		pa->set_color(sf::Color::Red);
+		pb->set_color(sf::Color::Red);
+	}
+	else {
+		pa->set_color(sf::Color::Green);
+		pb->set_color(sf::Color::Green);
+	}
+
+	/*
 	if (if_collide(*cir, *cir_2)) {
 		cir_2->set_color(sf::Color::Red);
 		//cir_collide(*cir, *cir_2);
@@ -99,34 +145,41 @@ void Engine::update() {
 	}
 	else
 		cir_2->set_color(sf::Color::Green);
+	*/
 
 	if (!this->pause) {
-		cir->iterate(dt);
-		cir_2->iterate(dt);
+		//cir->iterate(dt);
+		//cir_2->iterate(dt);
 
 		timer += dt;
 
 		//if (timer >= 5)	pause = true;
 	}
 	
+	/*
 	cir->draw();
 	cir_2->draw();
 	tri->draw();
+	*/
+	pa->update();
+	pb->update();
 }
 
 void Engine::render() {
 	this->window->clear();
 
 	//draw object
-	this->window->draw(cir->body());
-	this->window->draw(cir_2->body());
+	this->window->draw(pa->body());
+	this->window->draw(pb->body());
+	//this->window->draw(cir->body());
+	//this->window->draw(cir_2->body());
 	//this->window->draw(tri->body());
 
 	//draw text
 	std::string s;
-	s += "v1 = (" + std::to_string(cir->get_v().x) + ", " + std::to_string(cir->get_v().y) + ")\n";
-	s += "v2 = (" + std::to_string(cir_2->get_v().x) + ", " + std::to_string(cir_2->get_v().y) + ")\n";
-	s += ("dt = " + std::to_string(dt) + ", time = " + std::to_string(timer));
+	//s += "v1 = (" + std::to_string(cir->get_v().x) + ", " + std::to_string(cir->get_v().y) + ")\n";
+	//s += "v2 = (" + std::to_string(cir_2->get_v().x) + ", " + std::to_string(cir_2->get_v().y) + ")\n";
+	//s += ("dt = " + std::to_string(dt) + ", time = " + std::to_string(timer));
 
 	// caculating deviation
 	/*
@@ -141,4 +194,19 @@ void Engine::render() {
 	this->window->draw(cir_pos_text);
 
 	this->window->display();
+}
+
+template <class T>
+bool Engine::create() {
+	switch (T) {
+	case Circle:
+		this->objs.push_back(Circle());
+		break;
+	//case Polygon:
+		//this->objs.push_back(Polygon());
+		//break;
+	default:
+		return false;
+	}
+	return true;
 }

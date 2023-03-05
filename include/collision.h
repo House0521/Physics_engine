@@ -4,6 +4,7 @@
 #include "Circle.h"
 #include "Polygon.h"
 #include "my_math.h"
+#include <iostream>
 
 // collision detection
 bool if_collide(Circle& a, Circle& b);	// circle against circle
