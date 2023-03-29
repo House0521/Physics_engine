@@ -5,6 +5,7 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 
+
 namespace sfv {
 	//Vector math
 	float det(const sf::Vector2f& u, const sf::Vector2f& v);
@@ -27,7 +28,7 @@ namespace sfv {
 
 	//about polygon
 	sf::Vector2f com_of_polygon(std::vector<sf::Vector2f> point_pos);
-
+	float cacl_pol_interia(float mass, std::vector<sf::Vector2f> points);
 }
 
 #endif // MY_MATH_H

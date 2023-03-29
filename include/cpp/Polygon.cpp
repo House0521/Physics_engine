@@ -5,13 +5,14 @@
 Polygon::Polygon(std::vector<sf::Vector2f> point_pos)
 	: _point_count(point_pos.size()), _rel_point_pos(point_pos), Shape()
 {
-	// setting position to the com
+	// init vars
 	this->_pos = sfv::com_of_polygon(point_pos);
 
-	// init rel_point_pos
 	for (auto& point : _rel_point_pos) {
 		point -= _pos;
 	}
+
+	this->_interia = sfv::cacl_pol_interia(_mass, point_pos);
 
 	// init polyogn object
 	_polygon.setPointCount(point_pos.size());

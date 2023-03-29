@@ -5,6 +5,9 @@
 Circle::Circle() 
 	: _radius(30.f), Shape()
 {
+	//init vars
+	this->_interia = _mass * _radius * _radius / 2;
+
 	//init cir
 	this->_cir.setPosition(_pos.x, _pos.y);
 	this->_cir.setRadius(_radius);
@@ -17,6 +20,9 @@ Circle::Circle()
 Circle::Circle(float radius, float mass, float e,  sf::Vector2f pos, sf::Vector2f v, sf::Vector2f a, sf::Color color)
 	: _radius(radius), Shape(mass, e, pos, v, a, color, 0, 0)
 {
+	//init vars
+	this->_interia = _mass * _radius * _radius / 2;
+
 	//init cir
 	this->_cir.setPosition(_pos.x, _pos.y);
 	this->_cir.setRadius(_radius);

@@ -32,7 +32,7 @@ namespace sfv {
 		based on https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-oriented-rigid-bodies--gamedev-8032
 	*/
 
-	float cross(const sf::Vector2f& u, const sf::Vector2f& v) {	//resembles determinant
+	float cross(const sf::Vector2f& u, const sf::Vector2f& v) {	//resembles determinant, giving a scalar
 		return u.x * v.y - u.y * v.x;
 	}
 
@@ -88,4 +88,21 @@ namespace sfv {
 
 		return sum_v / sum_a;
 	}
+
+
+	float cacl_pol_interia(float mass, std::vector<sf::Vector2f> points) {
+		float numerator = 0, denominator = 0;
+		for (auto iter = points.begin(); iter != points.end(); iter++) {
+			auto next = iter;
+			if (iter == points.end() - 1)
+				next = points.begin();
+			else
+				next = iter + 1;
+			numerator += sfv::cross(*iter, *next) * (sfv::dot(*iter, *iter) + sfv::dot(*iter, *next) + sfv::dot(*next, *next));
+			denominator += sfv::cross(*iter, *next);
+		}
+
+		return (mass * numerator) / (6 * denominator);
+	}
 }
+

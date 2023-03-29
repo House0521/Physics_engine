@@ -7,6 +7,7 @@
 class Shape {
 protected:
 	float _mass, _e, _rec_mass;	// e : coefficient of restitution, rec_mass : the reciprocal of mass
+	float _interia;	// moment of interia
 	bool _immovable = false;	// mass = infinity, rec_mass = 0, v.a.omega.force = 0
 	sf::Vector2f _pos, _v, _a;
 	float _theta, _omega;	// positive value = clockwise, using rad
