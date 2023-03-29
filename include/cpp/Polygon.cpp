@@ -38,16 +38,21 @@ int Polygon::get_point_count() {
 	return this->_point_count;
 }
 
-std::vector<sf::Vector2f> Polygon::get_point_pos() {
-	std::vector<sf::Vector2f> real_point_pos = this->_rel_point_pos;
-	for (auto& point : real_point_pos)
+const std::vector<sf::Vector2f> Polygon::get_point_pos() {
+	std::vector<sf::Vector2f> real_point_pos;
+	for (auto point : this->_rel_point_pos) {
+		real_point_pos.push_back(sfv::rotate_trans(point, this->_theta));
+	}
+	for (auto& point : real_point_pos) {
 		point += this->_pos;
+	}
 	return real_point_pos;
 }
 
 //draw
 void Polygon::update() {
 	_polygon.setPosition(_pos);
+	_polygon.setRotation(_theta / PI * 180);
 	_polygon.setFillColor(_color);
 	//_polygon.setRotation();
 

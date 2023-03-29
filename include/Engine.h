@@ -20,14 +20,18 @@
 class Engine {
 private:
 	//Vars
-	int framerate;
-	float dt, timer;
-	bool pause;
+	int _framerate;
+	float _dt, _timer, _pause_time;
+	bool _pause, _gravity;
+
+	//constants
+	float g = 9.8;
 
 	//Window
-	sf::RenderWindow* window;
-	sf::Event ev;
-	sf::VideoMode videoMode;
+	float _win_height = 600, _win_width = 800;
+	sf::RenderWindow* _window;
+	sf::Event _ev;
+	sf::VideoMode _videoMode;
 
 	//Private finctions
 	void init_vars();
@@ -36,10 +40,9 @@ private:
 	void init_texts();
 
 	//Objects
-	//Circle* cir, *cir_2;
-	//Polygon* tri;
-	Polygon *pa, *pb;
-	std::vector<Circle> objs;
+	std::vector<Circle> cirs;
+	std::vector<Polygon> pols;
+	std::vector<Circle> points;
 
 	//Text
 	sf::Text cir_pos_text;

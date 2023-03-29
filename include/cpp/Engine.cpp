@@ -7,44 +7,50 @@
 
 //Pricate finctions
 void Engine::init_vars() {
-	this->window = nullptr;
+	this->_window = nullptr;
 
-	this->framerate = 60;
-	this->dt = float(1) / framerate;
-	this->timer = 0;
+	this->_framerate = 60;
+	this->_dt = float(1) / _framerate;
+	this->_timer = 0;
+	this->_pause_time = 10;
 
-	this->pause = false;
+	this->_gravity = true;
+	this->_pause = false;
 }
 
 void Engine::init_window() {
-	this->videoMode.height = 600;
-	this->videoMode.width = 800;
+	this->_videoMode.height = _win_height;
+	this->_videoMode.width = _win_width;
 
-	this->window = new sf::RenderWindow(this->videoMode, "Test", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(framerate);
+	this->_window = new sf::RenderWindow(this->_videoMode, "Test", sf::Style::Titlebar | sf::Style::Close);
+	this->_window->setFramerateLimit(_framerate);
 }
 
 void Engine::init_objs() {
-	/*
-	cir = new Circle;
-	cir->set_pos(sf::Vector2f(30, 30));
-	cir->set_v(sf::Vector2f(50, 0));
+	// the floor
+	std::vector<sf::Vector2f> floor_points;
+	floor_points.push_back(sf::Vector2f(0         , _win_height - 30));
+	floor_points.push_back(sf::Vector2f(_win_width, _win_height - 30));
+	floor_points.push_back(sf::Vector2f(_win_width, _win_height + 50));
+	floor_points.push_back(sf::Vector2f(0         , _win_height + 50));
+	pols.push_back(Polygon(floor_points));
+	pols[0].set_immovable(true);
+	
+	// circles
+	
+	cirs.push_back(Circle());
+	cirs[0].set_radius(30.f);
+	cirs[0].set_pos(sf::Vector2f(100.f, 100.f));
+	
 
-	cir_2 = new Circle;
-	cir_2->set_pos(sf::Vector2f(200, 30));
-	cir_2->set_color(sf::Color::Green);
-
-	std::vector<sf::Vector2f> points;
-	points.push_back(sf::Vector2f(30.0, 40.0));
-	points.push_back(sf::Vector2f(80.0, 70.0));
-	points.push_back(sf::Vector2f(100.0, 100.0));
-	tri = new Polygon(points);
-	*/
+	// polygons
 	std::vector<sf::Vector2f> points;
 	points.push_back(sf::Vector2f(30.0, 40.0));
 	points.push_back(sf::Vector2f(130.0, 140.0));
 	points.push_back(sf::Vector2f(80.0, 200.0));
-	pa = new Polygon(points);
+	pols.push_back(Polygon(points));
+	
+	
 	std::vector<sf::Vector2f> pointss;
 	pointss.push_back(sf::Vector2f(0.f, 0.f));
 	pointss.push_back(sf::Vector2f(100.f, 0.f));
@@ -52,7 +58,10 @@ void Engine::init_objs() {
 	pointss.push_back(sf::Vector2f(130.f, 100.f));
 	pointss.push_back(sf::Vector2f(90.f, 100.f));
 	pointss.push_back(sf::Vector2f(30.f, 40.f));
-	pb = new Polygon(pointss);
+	pols.push_back(Polygon(pointss));
+	//pols[1].set_omega(1.f);
+	pols[1].set_pos(300, 300);
+	
 }
 
 void Engine::init_texts() {
@@ -76,31 +85,24 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-	delete this->window;
-	delete this->pa;
-	//delete this->pb;
-	/*
-	delete this->cir;
-	delete this->cir_2;
-	delete this->tri;
-	*/
+	delete this->_window;
 }
 
 //Accessors
 const bool Engine::running() const {
-	return this->window->isOpen();
+	return this->_window->isOpen();
 }
 
 //Funcitons
 void Engine::poll_events() {
-	while (this->window->pollEvent(this->ev)) {
-		switch (this->ev.type) {
+	while (this->_window->pollEvent(this->_ev)) {
+		switch (this->_ev.type) {
 		case sf::Event::Closed:
-			this->window->close();
+			this->_window->close();
 			break;
 		case sf::Event::KeyPressed:
-			if (this->ev.key.code == sf::Keyboard::Escape)
-				this->window->close();
+			if (this->_ev.key.code == sf::Keyboard::Escape)
+				this->_window->close();
 			break;
 		}
 	}
@@ -110,70 +112,83 @@ void Engine::poll_events() {
 void Engine::update() {
 	this->poll_events();
 
-	//mouse
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-		pb->set_pos(pb->get_pos() - sf::Vector2f(10, 10));
-	pb->set_pos(sf::Vector2f(sf::Mouse::getPosition()));
+	// ----------------operation-------------------
 
-	// checking collision
-	/*
-	for (auto it_1 = objs.begin(); it_1 != objs.end(); it_1++) {
-		for (auto it_2 = objs.begin(); it_2 != objs.end(); it_2++) {
-			if (it_2 <= it_1)	continue;
-			if (if_collide(*it_1, *it_2)) {
+	auto& obja = pols[1];
+	auto& objb = pols[2];
 
-			}
-		}
-	}
-	*/
+	// mouse
+	obja.set_pos(sf::Vector2f(sf::Mouse::getPosition()));
+
 	
-	
-	if (if_collide(*pa, *pb)) {
-		pa->set_color(sf::Color::Red);
-		pb->set_color(sf::Color::Red);
+	Collision_data cd = if_collide(obja, objb);
+	while(!this->points.empty())
+		this->points.pop_back();
+
+	if (cd.collide) {
+		Circle pt;	// illustrating contact point
+		pt.set_radius(5.f);
+		pt.set_pos(cd.contact_point);
+		pt.set_color(sf::Color::White);
+		this->points.push_back(pt);
+		//std::cout << cd.depth << "\n";
+
+		obja.set_color(sf::Color::Red);
+		objb.set_color(sf::Color::Red);
 	}
 	else {
-		pa->set_color(sf::Color::Green);
-		pb->set_color(sf::Color::Green);
+		obja.set_color(sf::Color::Green);
+		objb.set_color(sf::Color::Green);
 	}
 
-	/*
-	if (if_collide(*cir, *cir_2)) {
-		cir_2->set_color(sf::Color::Red);
-		//cir_collide(*cir, *cir_2);
-		collide(*cir, *cir_2);
-	}
-	else
-		cir_2->set_color(sf::Color::Green);
-	*/
+	// ----------------operation-------------------
 
-	if (!this->pause) {
-		//cir->iterate(dt);
-		//cir_2->iterate(dt);
 
-		timer += dt;
+	// step
+	if (!this->_pause) {
+		// gravity
+		for (auto& cir : cirs)
+			cir.set_a(sf::Vector2f(0, g) + cir.get_a());	// y positive is donwards
+		for (auto& pol : pols)
+			pol.set_a(sf::Vector2f(0, g) + pol.get_a());
 
-		//if (timer >= 5)	pause = true;
+
+		// objs step
+		for (auto &cir : cirs)
+			cir.step(_dt);
+		for (auto &pol : pols)
+			pol.step(_dt);
+
+		// refresh forces
+		for (auto& cir : cirs)
+			cir.refresh_forces();
+		for (auto& pol : pols)
+			pol.refresh_forces();
+
+		_timer += _dt;
+
+		//if (_timer >= _pause_time)	_pause = true;
 	}
 	
-	/*
-	cir->draw();
-	cir_2->draw();
-	tri->draw();
-	*/
-	pa->update();
-	pb->update();
+	// update objs
+	for (auto &cir : cirs)
+		cir.update();
+	for (auto &pol : pols)
+		pol.update();
+	for (auto& point : points)
+		point.update();
 }
 
 void Engine::render() {
-	this->window->clear();
+	this->_window->clear();
 
 	//draw object
-	this->window->draw(pa->body());
-	this->window->draw(pb->body());
-	//this->window->draw(cir->body());
-	//this->window->draw(cir_2->body());
-	//this->window->draw(tri->body());
+	for (auto &cir : cirs)
+		this->_window->draw(cir.body());
+	for (auto &pol : pols)
+		this->_window->draw(pol.body());
+	for (auto& point : points)
+		this->_window->draw(point.body());
 
 	//draw text
 	std::string s;
@@ -191,16 +206,16 @@ void Engine::render() {
 
 	cir_pos_text.setString(s);
 
-	this->window->draw(cir_pos_text);
+	this->_window->draw(cir_pos_text);
 
-	this->window->display();
+	this->_window->display();
 }
 
 template <class T>
 bool Engine::create() {
 	switch (T) {
 	case Circle:
-		this->objs.push_back(Circle());
+		//this->objs.push_back(Circle());
 		break;
 	//case Polygon:
 		//this->objs.push_back(Polygon());

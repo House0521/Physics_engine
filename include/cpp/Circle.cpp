@@ -10,11 +10,12 @@ Circle::Circle()
 	this->_cir.setRadius(_radius);
 	this->_cir.setFillColor(_color);
 
-	//set the origin to the center of the mass
-	this->_cir.setOrigin(sf::Vector2f(_pos.x + _radius, _pos.y + _radius));
+	//set the origin to the center of mass
+	this->_cir.setOrigin(sf::Vector2f(_radius, _radius));
+
 }
 Circle::Circle(float radius, float mass, float e,  sf::Vector2f pos, sf::Vector2f v, sf::Vector2f a, sf::Color color)
-	: _radius(radius), Shape(mass, e, pos, v, a, color)
+	: _radius(radius), Shape(mass, e, pos, v, a, color, 0, 0)
 {
 	//init cir
 	this->_cir.setPosition(_pos.x, _pos.y);
@@ -22,7 +23,7 @@ Circle::Circle(float radius, float mass, float e,  sf::Vector2f pos, sf::Vector2
 	this->_cir.setFillColor(_color);
 
 	//set the origin to the center of the mass
-	this->_cir.setOrigin(sf::Vector2f(_pos.x + _radius, _pos.y + _radius));
+	this->_cir.setOrigin(sf::Vector2f( _radius,_radius));
 }
 
 Circle::~Circle() {
@@ -33,6 +34,7 @@ Circle::~Circle() {
 void Circle::set_radius(float radius){
 	this->_radius = radius;
 	this->_cir.setRadius(radius);
+	this->_cir.setOrigin(sf::Vector2f(_radius, _radius));
 }
 
 
@@ -46,8 +48,9 @@ float Circle::get_radius() {
 
 
 //draw : update things about the entity
-void Circle::draw() {
+void Circle::update() {
 	this->_cir.setPosition(_pos.x, _pos.y);
+	this->_cir.setRotation(_theta / PI * 180);	// when there's no friction it's meaningless
 	this->_cir.setRadius(_radius);
 	this->_cir.setFillColor(_color);
 }

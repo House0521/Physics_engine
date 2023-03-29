@@ -6,9 +6,18 @@
 #include "my_math.h"
 #include <iostream>
 
+struct Collision_data {
+	bool collide = false;	// collide or not
+	sf::Vector2f normal;
+	sf::Vector2f contact_point;
+	float depth = 0.f;
+};
+
 // collision detection
-bool if_collide(Circle& a, Circle& b);	// circle against circle
-bool if_collide(Polygon& a, Polygon& b);	//using SAT
+Collision_data if_collide(Circle& a, Circle& b);	// circle against circle
+Collision_data if_collide(Polygon& a, Polygon& b);	//using SAT
+Collision_data if_collide(Polygon& p, Circle& c);
+Collision_data if_collide(Circle& c, Polygon& p);
 
 // collision response
 void cir_collide(Circle& a, Circle& b);	// only for circle, using spring method

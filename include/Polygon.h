@@ -13,6 +13,8 @@
 
 #include "Shape.h"
 
+#define PI 3.14159265
+
 class Polygon : public Shape {
 private:
 	int _point_count;
@@ -26,7 +28,7 @@ public:
 	//access
 	sf::ConvexShape body();
 	int get_point_count();
-	std::vector<sf::Vector2f> get_point_pos();
+	const std::vector<sf::Vector2f> get_point_pos();
 
 	//draw
 	void update();

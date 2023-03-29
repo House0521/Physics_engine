@@ -1,11 +1,13 @@
 #ifndef CIRCLE_H
 #define CIRCLE_H
 
+#include <cmath>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "Shape.h"
 
+#define PI 3.14159265
 
 class Circle : public Shape{
 private:
@@ -27,7 +29,7 @@ public:
 	float get_radius();
 
 	//draw
-	void draw();
+	void update();
 
 };
 
