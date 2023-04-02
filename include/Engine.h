@@ -25,7 +25,7 @@ private:
 	bool _pause, _gravity;
 
 	//constants
-	float g = 9.8;
+	float g = 500;
 
 	//Window
 	float _win_height = 600, _win_width = 800;
@@ -60,6 +60,8 @@ public:
 	void poll_events();
 	void update();
 	void render();
+	void pause(bool pau);
+	void resolve_collision();
 
 	//Creaters
 	template <class T>

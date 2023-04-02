@@ -1,8 +1,21 @@
 #include "../my_math.h"
 
 namespace sfv {
+	// Scalar math
+	float square(float x) {
+		return x * x;
+	}
+
+	bool flt_equal(float a, float b) {
+		return std::abs(a - b) < DEVIATION;
+	}
+
 
 	// Vector math
+	bool flt_equal(const sf::Vector2f& u, const sf::Vector2f& v) {
+		return std::abs(u.x - v.x) < DEVIATION && std::abs(u.y - v.y) < DEVIATION;
+	}
+
 	float det(const sf::Vector2f& u, const sf::Vector2f& v) {
 		return u.x * v.y - u.y * v.x;
 	}
@@ -103,6 +116,29 @@ namespace sfv {
 		}
 
 		return (mass * numerator) / (6 * denominator);
+	}
+
+
+	bool point_in_polygon(sf::Vector2f p, std::vector<sf::Vector2f> vertex) {	
+		float last = 0, now = 0;	// using cross product to see if vec(vertex - p) rotate in the same direction
+		for (auto iter = vertex.begin(); iter != vertex.end(); iter++) {
+			auto next = iter;
+			if (iter == vertex.end() - 1)
+				next = vertex.begin();
+			else
+				next = iter + 1;
+
+			sf::Vector2f va = *iter - p, vb = *next - p;
+			last = now;
+			now = sfv::cross(va, vb);
+			if (last == 0)
+				continue;
+			if (static_cast<float>(last) * static_cast<float>(now) >= 0)	// both positive or both negative
+				continue;
+			if (last * now <= 0)
+				return false;
+		}
+		return true;
 	}
 }
 

@@ -5,9 +5,15 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 
+#define DEVIATION 0.05
 
 namespace sfv {
+	// Scalar math
+	float square(float x);
+	bool flt_equal(float a, float b);
+
 	//Vector math
+	bool flt_equal(const sf::Vector2f& u, const sf::Vector2f& v);
 	float det(const sf::Vector2f& u, const sf::Vector2f& v);
 	float abs(const sf::Vector2f& vec);
 	float distance(const sf::Vector2f& p1, const sf::Vector2f& p2);
@@ -28,7 +34,8 @@ namespace sfv {
 
 	//about polygon
 	sf::Vector2f com_of_polygon(std::vector<sf::Vector2f> point_pos);
-	float cacl_pol_interia(float mass, std::vector<sf::Vector2f> points);
+	float cacl_pol_interia(float mass, std::vector<sf::Vector2f> vertex);
+	bool point_in_polygon(sf::Vector2f p, std::vector<sf::Vector2f> vertex);
 }
 
 #endif // MY_MATH_H

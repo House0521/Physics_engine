@@ -12,7 +12,8 @@ Polygon::Polygon(std::vector<sf::Vector2f> point_pos)
 		point -= _pos;
 	}
 
-	this->_interia = sfv::cacl_pol_interia(_mass, point_pos);
+	this->_inertia = sfv::cacl_pol_interia(_mass, point_pos);
+
 
 	// init polyogn object
 	_polygon.setPointCount(point_pos.size());

@@ -5,12 +5,12 @@
 
 //Cons / Decons
 Shape::Shape()
-	: _mass(1.f), _rec_mass(1 / _mass), _e(1), _pos(sf::Vector2f(0.f, 0.f)), _v(sf::Vector2f(0.f, 0.f)), _a(sf::Vector2f(0.f, 0.f)), _color(sf::Color::Cyan), _theta(0), _omega(0)
+	: _mass(1.f), _rec_mass(1 / _mass), _e(1), _inertia(0), _pos(sf::Vector2f(0.f, 0.f)), _v(sf::Vector2f(0.f, 0.f)), _a(sf::Vector2f(0.f, 0.f)), _color(sf::Color::Cyan), _theta(0), _omega(0)
 {
 
 }
 Shape::Shape(float mass, float e, sf::Vector2f pos, sf::Vector2f v, sf::Vector2f a, sf::Color color, float theta, float omega)
-	: _mass(mass), _rec_mass(1 / mass), _e(e), _pos(pos), _v(v), _a(a), _color(color), _theta(theta), _omega(omega)
+	: _mass(mass), _rec_mass(1 / mass), _e(e), _inertia(0), _pos(pos), _v(v), _a(a), _color(color), _theta(theta), _omega(omega)
 {
 
 }
@@ -61,8 +61,6 @@ void Shape::set_omega(float omega) {
 	this->_omega = omega;
 }
 void Shape::set_color(sf::Color color) {
-	if (this->_immovable)
-		return;
 	_color = color;
 }
 void Shape::set_e(float e) {
@@ -82,6 +80,7 @@ void Shape::set_immovable(bool immovable) {
 		this->_omega = 0;
 	}
 }
+
 
 //access
 sf::Vector2f Shape::get_pos() {
@@ -112,6 +111,9 @@ float Shape::get_rec_mass() {
 	if (this->_immovable)
 		return 0.0;
 	return this->_rec_mass;
+}
+float Shape::get_inertia() {
+	return this->_inertia;
 }
 bool Shape::get_immovable() {
 	return this->_immovable;
@@ -153,6 +155,7 @@ float Shape::theta_prime(float delta_t) {
 
 //motion
 void Shape::step(float dt) {
+
 	/*
 		Eular's method :
 			_pos += _v * dt;

@@ -9,7 +9,7 @@
 void Engine::init_vars() {
 	this->_window = nullptr;
 
-	this->_framerate = 60;
+	this->_framerate = 500;
 	this->_dt = float(1) / _framerate;
 	this->_timer = 0;
 	this->_pause_time = 10;
@@ -27,7 +27,7 @@ void Engine::init_window() {
 }
 
 void Engine::init_objs() {
-	// the floor
+	// the floor (pol[0])
 	std::vector<sf::Vector2f> floor_points;
 	floor_points.push_back(sf::Vector2f(0         , _win_height - 30));
 	floor_points.push_back(sf::Vector2f(_win_width, _win_height - 30));
@@ -40,17 +40,29 @@ void Engine::init_objs() {
 	
 	cirs.push_back(Circle());
 	cirs[0].set_radius(30.f);
-	cirs[0].set_pos(sf::Vector2f(100.f, 100.f));
+	cirs[0].set_pos(sf::Vector2f(0.f, 100.f));
+	cirs[0].set_v(sf::Vector2f(500, 0));
+	
+
+	
+	cirs.push_back(Circle());
+	cirs[1].set_radius(50.f);
+	cirs[1].set_pos(sf::Vector2f(500.f, 90.f));
+	cirs[1].set_mass(25 / 9);
 	
 
 	// polygons
 	std::vector<sf::Vector2f> points;
-	points.push_back(sf::Vector2f(30.0, 40.0));
-	points.push_back(sf::Vector2f(130.0, 140.0));
-	points.push_back(sf::Vector2f(80.0, 200.0));
+	points.push_back(sf::Vector2f(0.0, 0.0));
+	points.push_back(sf::Vector2f(100.0, 0.0));
+	points.push_back(sf::Vector2f(100.0, 100.0));
+	points.push_back(sf::Vector2f(0.0, 100.0));
 	pols.push_back(Polygon(points));
+	pols[1].rotate(PI / 3);
+	pols[1].set_pos(100, 0);
+	pols[1].set_v(0, 0);
 	
-	
+	/*
 	std::vector<sf::Vector2f> pointss;
 	pointss.push_back(sf::Vector2f(0.f, 0.f));
 	pointss.push_back(sf::Vector2f(100.f, 0.f));
@@ -60,7 +72,8 @@ void Engine::init_objs() {
 	pointss.push_back(sf::Vector2f(30.f, 40.f));
 	pols.push_back(Polygon(pointss));
 	//pols[1].set_omega(1.f);
-	pols[1].set_pos(300, 300);
+	pols[2].set_pos(300, 300);
+	*/
 	
 }
 
@@ -112,46 +125,18 @@ void Engine::poll_events() {
 void Engine::update() {
 	this->poll_events();
 
-	// ----------------operation-------------------
-
-	auto& obja = pols[1];
-	auto& objb = pols[2];
-
-	// mouse
-	obja.set_pos(sf::Vector2f(sf::Mouse::getPosition()));
-
-	
-	Collision_data cd = if_collide(obja, objb);
-	while(!this->points.empty())
-		this->points.pop_back();
-
-	if (cd.collide) {
-		Circle pt;	// illustrating contact point
-		pt.set_radius(5.f);
-		pt.set_pos(cd.contact_point);
-		pt.set_color(sf::Color::White);
-		this->points.push_back(pt);
-		//std::cout << cd.depth << "\n";
-
-		obja.set_color(sf::Color::Red);
-		objb.set_color(sf::Color::Red);
-	}
-	else {
-		obja.set_color(sf::Color::Green);
-		objb.set_color(sf::Color::Green);
-	}
-
-	// ----------------operation-------------------
+	this->resolve_collision();
 
 
 	// step
 	if (!this->_pause) {
 		// gravity
-		for (auto& cir : cirs)
-			cir.set_a(sf::Vector2f(0, g) + cir.get_a());	// y positive is donwards
-		for (auto& pol : pols)
-			pol.set_a(sf::Vector2f(0, g) + pol.get_a());
-
+		if (this->_gravity) {
+			for (auto& cir : cirs)
+				cir.set_a(sf::Vector2f(0, g) + cir.get_a());	// y positive is donwards
+			for (auto& pol : pols)
+				pol.set_a(sf::Vector2f(0, g) + pol.get_a());
+		}
 
 		// objs step
 		for (auto &cir : cirs)
@@ -210,6 +195,54 @@ void Engine::render() {
 
 	this->_window->display();
 }
+
+void Engine::pause(bool pau) {
+	this->_pause = pau;
+}
+
+void Engine::resolve_collision() {
+	auto& obja = pols[1];
+	auto& objb = pols[0];
+
+	// mouse
+	//obja.set_pos(sf::Vector2f(sf::Mouse::getPosition()));
+
+
+	Collision_data cd = if_collide(obja, objb);
+	collide(objb, obja, cd);
+
+	while (!this->points.empty())
+		this->points.pop_back();
+
+	if (cd.collide) {
+		Circle pt;	// illustrating contact point
+		pt.set_radius(5.f);
+		pt.set_pos(cd.contact_points[0]);
+		pt.set_color(sf::Color::White);
+		this->points.push_back(pt);
+		if (cd.contact_point_count == 2) {
+			pt.set_pos(cd.contact_points[1]);
+			pt.set_color(sf::Color::White);
+			this->points.push_back(pt);
+		}
+		//std::cout << cd.depth << "\n";
+		obja.set_color(sf::Color::Red);
+		objb.set_color(sf::Color::Red);
+
+		//std::cout << "collide : " << cd.collide << "\n";
+		//std::cout << "normal : (" << cd.normal.x << ", " << cd.normal.y << ")\n";
+		//std::cout << "contact point : (" << cd.contact_point.x << ", " << cd.contact_point.y << ")\n";
+		//std::cout << "depth : " << cd.depth << "\n";
+		//system("pause");
+
+	}
+	else {
+		obja.set_color(sf::Color::Green);
+		objb.set_color(sf::Color::Green);
+	}
+}
+
+// Creaters
 
 template <class T>
 bool Engine::create() {
