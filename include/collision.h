@@ -6,8 +6,8 @@
 #include "my_math.h"
 #include <iostream>
 
-#define INIT_VEC sf::Vector2f(FLT_MAX, FLT_MAX)
-#define INIT_SCA FLT_MAX
+#define INIT_VEC sf::Vector2f(FLT_MAX, FLT_MAX)	// initial vector
+#define INIT_SCA FLT_MAX						// initial scalar
 
 struct Collision_data {
 	bool collide = false;	// collide or not

@@ -20,7 +20,7 @@
 class Engine {
 private:
 	//Vars
-	int _framerate;
+	int _framerate;	// update frequency
 	float _dt, _timer, _pause_time;
 	bool _pause, _gravity;
 
@@ -62,6 +62,10 @@ public:
 	void render();
 	void pause(bool pau);
 	void resolve_collision();
+	void process_text();
+
+	//
+	float total_E();
 
 	//Creaters
 	template <class T>

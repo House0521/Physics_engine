@@ -5,7 +5,7 @@
 
 //Cons / Decons
 Shape::Shape()
-	: _mass(1.f), _rec_mass(1 / _mass), _e(1), _inertia(0), _pos(sf::Vector2f(0.f, 0.f)), _v(sf::Vector2f(0.f, 0.f)), _a(sf::Vector2f(0.f, 0.f)), _color(sf::Color::Cyan), _theta(0), _omega(0)
+	: _mass(1.f), _rec_mass(1 / _mass), _e(0.9), _inertia(0), _pos(sf::Vector2f(0.f, 0.f)), _v(sf::Vector2f(0.f, 0.f)), _a(sf::Vector2f(0.f, 0.f)), _color(sf::Color::Cyan), _theta(0), _omega(0)
 {
 
 }
@@ -105,15 +105,24 @@ float Shape::get_e() {
 	return this->_e;
 }
 float Shape::get_mass() {
+	if (this->_immovable)
+		return FLT_MAX;
 	return this->_mass;
 }
 float Shape::get_rec_mass() {
 	if (this->_immovable)
-		return 0.0;
+		return 0.0f;
 	return this->_rec_mass;
 }
 float Shape::get_inertia() {
+	if (this->_immovable)
+		return FLT_MAX;
 	return this->_inertia;
+}
+float Shape::get_rec_inertia() {
+	if (this->_immovable)
+		return 0.0f;
+	return 1.f / this->_inertia;
 }
 bool Shape::get_immovable() {
 	return this->_immovable;

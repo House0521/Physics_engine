@@ -44,6 +44,7 @@ public:
 	float get_mass();
 	float get_rec_mass();
 	float get_inertia();
+	float get_rec_inertia();
 	bool get_immovable();
 
 	// move

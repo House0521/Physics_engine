@@ -16,7 +16,6 @@ Collision_data if_collide(Circle& a, Circle& b) {	// circle against circle
 	return cd;
 }
 
-
 Collision_data if_collide(Polygon& a, Polygon& b) {	//using SAT
 	
 	Collision_data cd;
@@ -91,7 +90,7 @@ Collision_data if_collide(Polygon& a, Polygon& b) {	//using SAT
 					continue;
 				}
 				float depth = sfv::point_lineseg_dis(vertex, start, end);
-				if (std::abs(depth - cd.depth) < 1) {
+				if (sfv::flt_equal(depth, cd.depth)) {
 					if (sfv::flt_equal(vertex, cd.contact_points[0]))	
 						continue;
 					cd.contact_point_count = 2;
@@ -114,9 +113,13 @@ Collision_data if_collide(Polygon& a, Polygon& b) {	//using SAT
 
 	// -------------------caculating contact point, depth, normal : end-------------------
 
+
+	// last check
+	if (cd.contact_points[0] == INIT_VEC && cd.depth == INIT_SCA)
+		cd.collide = false;
+
 	return cd;
 }
-
 
 Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 	Collision_data cd;
@@ -186,20 +189,20 @@ Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 			b = *(point + 1);
 		sf::Vector2f ab = b - a;
 		
+
 		float ccp = sfv::projection_f(cc - a, ab);	// the projection of cc
 		sf::Vector2f ccpv = a + sfv::projection_v(cc - a, ab);
 		if (0 < ccp && ccp < sfv::abs(ab) && sfv::abs(ccpv - cc) < c.get_radius()){	// the projevtion of cc is between a and b  &&  d(cc, edge) < r
-			float depth = c.get_radius() - sfv::abs(ccpv - cc);
+			float depth = c.get_radius() - sfv::point_lineseg_dis(cc, a, b);
 			if (depth < cd.depth) {
 				cd.depth = depth;
 				cd.contact_points[0] = ccpv;	// contact point found
 			}
 		}
-
 	}
 
+	
 	// when the contact point is on one of the vertices of p
-
 	for (auto& point : pps) {
 		if (sfv::distance(point, cc) > c.get_radius())
 			continue;
@@ -210,6 +213,11 @@ Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 		}
 	}
 	
+	if (cd.depth == FLT_MAX || cd.contact_points[0] == INIT_VEC) {
+		cd.normal[0] = INIT_VEC;
+		cd.collide = false;
+		return cd;	// not colliding
+	}
 	cd.normal[0] = cd.contact_points[0] - cc;
 
 	// -------------------caculating contact point, depth, normal-------------------
@@ -221,7 +229,11 @@ Collision_data if_collide(Circle& c, Polygon& p) {
 	return if_collide(p, c);
 }
 
+
 // collision response
+
+// old function, not used anymore
+/*
 void cir_collide(Circle& a, Circle& b) {	// using Hooke's law
 	if (!if_collide(a, b).collide)	return;
 
@@ -232,7 +244,7 @@ void cir_collide(Circle& a, Circle& b) {	// using Hooke's law
 	b.apply_force(abs_f * sfv::unitv(b.get_pos() - a.get_pos()));
 }
 
-/*
+
 void collide(Circle& a, Circle& b) {	// circle against circle, using impulse method
 	sf::Vector2f normal = b.get_pos() - a.get_pos();	// normal : normal vector of the collision, derection : a to b (pos_b-pos_a)
 	float e = a.get_e() * b.get_e();	// or min(a.e, b.e)
@@ -287,6 +299,7 @@ void collide(Circle& c, Polygon& p, Collision_data cd) {
 	collide(p, c, cd);
 }
 */
+
 void collide(Shape& a, Shape& b, Collision_data cd) {
 	if (!cd.collide)
 		return;
@@ -300,24 +313,24 @@ void collide(Shape& a, Shape& b, Collision_data cd) {
 	for (int i = 0; i < cd.contact_point_count; i++) {
 
 		float e = a.get_e() * b.get_e();	// or min(a.e, b.e)
-		
+
 		sf::Vector2f ra = sfv::normalv(cd.contact_points[i] - a.get_pos());
 		sf::Vector2f rb = sfv::normalv(cd.contact_points[i] - b.get_pos());
 		sf::Vector2f vap = a.get_v() + a.get_omega() * ra;
 		sf::Vector2f vbp = b.get_v() + b.get_omega() * rb;
-		float Ia = a.get_inertia();
-		float Ib = b.get_inertia();
+		float rec_Ia = a.get_rec_inertia();
+		float rec_Ib = b.get_rec_inertia();
 
 		float j_numerator = -(1.f + e) * sfv::dot((vap - vbp), n);
-		float j_denominator = sfv::dot(n, n * (a.get_rec_mass() + b.get_rec_mass())) + sfv::square(sfv::dot(ra, n)) / Ia + sfv::square(sfv::dot(rb, n)) / Ib;
+		float j_denominator = sfv::dot(n, n * (a.get_rec_mass() + b.get_rec_mass())) + sfv::square(sfv::dot(ra, n)) * rec_Ia + sfv::square(sfv::dot(rb, n)) * rec_Ib;
 		float j = j_numerator / j_denominator;
 
 		j /= cd.contact_point_count;
 		
-		del_va += n * (j / a.get_mass());
-		del_omega_a +=  sfv::dot(ra, j * n) / Ia;
-		del_vb += n * (-j / b.get_mass());
-		del_omega_b += sfv::dot(rb, -j * n) / Ib;
+		del_va += n * (j * a.get_rec_mass());
+		del_omega_a +=  sfv::dot(ra, j * n) * rec_Ia;
+		del_vb += n * (-j * b.get_rec_mass());
+		del_omega_b += sfv::dot(rb, -j * n) * rec_Ib;
 	}
 
 	a.set_v(a.get_v() + del_va);
@@ -325,10 +338,11 @@ void collide(Shape& a, Shape& b, Collision_data cd) {
 	b.set_v(b.get_v() + del_vb);
 	b.set_omega(b.get_omega() + del_omega_b);
 
-	sf::Vector2f overlap = sfv::unitv(n) * cd.depth;
+	sf::Vector2f overlap = sfv::unitv(n) * cd.depth * (float)0.9;
 	if (sfv::dot(overlap, a.get_pos() - b.get_pos()) < 0)
 		overlap = -overlap;
 
+	
 	if (a.get_immovable())
 		b.move(-overlap);
 	else if (b.get_immovable())
@@ -338,7 +352,8 @@ void collide(Shape& a, Shape& b, Collision_data cd) {
 		b.move(-overlap * a.get_mass() / (a.get_mass() + b.get_mass()));
 	}
 	
-	std::cout << "del_va = (" << del_va.x << ", " << del_va.y << ")\n";
+
+	//std::cout << "del_va = (" << del_va.x << ", " << del_va.y << ")\n";
 	//std::cout << "del_omega_a = " << del_omega_a << "\n";
 	//system("pause");
 

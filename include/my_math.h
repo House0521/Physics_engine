@@ -13,6 +13,7 @@ namespace sfv {
 	bool flt_equal(float a, float b);
 
 	//Vector math
+	float square(const sf::Vector2f& vec);
 	bool flt_equal(const sf::Vector2f& u, const sf::Vector2f& v);
 	float det(const sf::Vector2f& u, const sf::Vector2f& v);
 	float abs(const sf::Vector2f& vec);

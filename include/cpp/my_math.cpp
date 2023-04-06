@@ -12,6 +12,10 @@ namespace sfv {
 
 
 	// Vector math
+	float square(const sf::Vector2f& vec) {
+		return sfv::dot(vec, vec);
+	}
+
 	bool flt_equal(const sf::Vector2f& u, const sf::Vector2f& v) {
 		return std::abs(u.x - v.x) < DEVIATION && std::abs(u.y - v.y) < DEVIATION;
 	}
