@@ -5,7 +5,7 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 
-#define DEVIATION 0.05
+#define EPSILON 1
 
 namespace sfv {
 	// Scalar math

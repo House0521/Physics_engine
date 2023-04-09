@@ -71,41 +71,49 @@ Collision_data if_collide(Polygon& a, Polygon& b) {	//using SAT
 	// -------------------caculating contact point, depth, normal : start-------------------
 	// iterate through all the vertices and edges, and find the closest pair
 
-	cd.depth = FLT_MAX;
+	cd.depth = -FLT_MAX;
 
 	for (int cnt = 0; cnt < 2; cnt++) {
 		if (cnt == 1)
 			std::swap(aps, bps);
-		for (auto iter = aps.begin(); iter != aps.end(); iter++) {	// taking edges
-			sf::Vector2f start, end;	// (end - start) is the edge
-			if (iter != aps.end() - 1)
-				end = *(iter + 1), start = *iter;
-			else
-				end = *aps.begin(), start = *iter;
 
-			for (auto vertex : bps) {
-				if (!sfv::point_in_polygon(vertex, aps)) {
-					//std::cout << "skipping vertex : (" << vertex.x << ", " << vertex.y << ")\n";
-					//system("pause");
+		for (auto vertex : bps) {	// iterating through vertices
+			std::vector<sf::Vector2f> depths;
+
+			if (!sfv::point_in_polygon(vertex, aps))
+				continue;
+
+			float now_depth = FLT_MAX;
+			sf::Vector2f now_normal = INIT_VEC;
+			for (auto iter = aps.begin(); iter != aps.end(); iter++) {	// iterating through edges
+
+				sf::Vector2f start, end;	// (end - start) is the edge
+				if (iter != aps.end() - 1)
+					end = *(iter + 1), start = *iter;
+				else
+					end = *aps.begin(), start = *iter;
+
+				if (sfv::point_lineseg_dis(vertex, start, end) < now_depth) {
+					now_depth = sfv::point_lineseg_dis(vertex, start, end);
+					now_normal = end - start;
+				}
+			}
+
+			if (sfv::flt_equal(now_depth, cd.depth)) {
+				if (sfv::flt_equal(vertex, cd.contact_points[0]))	
 					continue;
-				}
-				float depth = sfv::point_lineseg_dis(vertex, start, end);
-				if (sfv::flt_equal(depth, cd.depth)) {
-					if (sfv::flt_equal(vertex, cd.contact_points[0]))	
-						continue;
-					cd.contact_point_count = 2;
-					cd.contact_points[1] = vertex;
-					cd.normal[1] = sfv::normalv(end - start);
-				}
-				else if (depth < cd.depth) {
-					cd.depth = depth;
-					//std::cout << "setting depth : " << depth << ", ";
-					//std::cout << "at point " << "(" << vertex.x << ", " << vertex.y << ")\n";
-					//system("pause");
-					cd.contact_points[0] = vertex;
-					cd.contact_point_count = 1;
-					cd.normal[0] = sfv::normalv(end - start);
-				}
+				cd.contact_point_count = 2;
+				cd.contact_points[1] = vertex;
+				cd.normal[1] = sfv::normalv(now_normal);
+			}
+			else if (now_depth > cd.depth) {
+				cd.depth = now_depth;
+				//std::cout << "setting depth : " << depth << ", ";
+				//std::cout << "at point " << "(" << vertex.x << ", " << vertex.y << ")\n";
+				//system("pause");
+				cd.contact_points[0] = vertex;
+				cd.contact_point_count = 1;
+				cd.normal[0] = sfv::normalv(now_normal);
 			}
 		}
 	}
@@ -176,7 +184,7 @@ Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 	cd.collide = true;
 
 	// -------------------caculating contact point, depth, normal-------------------
-	cd.depth = FLT_MAX;
+	cd.depth = -FLT_MAX;
 
 	// when the contact point is on one of the edges of p
 	for (auto point = pps.begin(); point != pps.end(); point++) {
@@ -189,12 +197,14 @@ Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 			b = *(point + 1);
 		sf::Vector2f ab = b - a;
 		
+		if (sfv::point_lineseg_dis(cc, a, b) > c.get_radius())
+			continue;
 
 		float ccp = sfv::projection_f(cc - a, ab);	// the projection of cc
 		sf::Vector2f ccpv = a + sfv::projection_v(cc - a, ab);
 		if (0 < ccp && ccp < sfv::abs(ab) && sfv::abs(ccpv - cc) < c.get_radius()){	// the projevtion of cc is between a and b  &&  d(cc, edge) < r
 			float depth = c.get_radius() - sfv::point_lineseg_dis(cc, a, b);
-			if (depth < cd.depth) {
+			if (depth > cd.depth) {
 				cd.depth = depth;
 				cd.contact_points[0] = ccpv;	// contact point found
 			}
@@ -207,7 +217,7 @@ Collision_data if_collide(Polygon& p, Circle& c) {	//using SAT
 		if (sfv::distance(point, cc) > c.get_radius())
 			continue;
 		float depth = c.get_radius() - sfv::distance(point, cc);
-		if (depth < cd.depth) {
+		if (depth > cd.depth) {
 			cd.depth = depth;
 			cd.contact_points[0] = point;	// contact point found
 		}
@@ -237,7 +247,7 @@ Collision_data if_collide(Circle& c, Polygon& p) {
 void cir_collide(Circle& a, Circle& b) {	// using Hooke's law
 	if (!if_collide(a, b).collide)	return;
 
-	long long K = 100;
+	int K = 100;
 	float x = (a.get_radius() + b.get_radius()) - sfv::abs(a.get_pos() - b.get_pos());
 	float abs_f = K * x;	// F = kx
 	a.apply_force(abs_f * sfv::unitv(a.get_pos() - b.get_pos()));
@@ -338,11 +348,12 @@ void collide(Shape& a, Shape& b, Collision_data cd) {
 	b.set_v(b.get_v() + del_vb);
 	b.set_omega(b.get_omega() + del_omega_b);
 
+
 	sf::Vector2f overlap = sfv::unitv(n) * cd.depth * (float)0.9;
 	if (sfv::dot(overlap, a.get_pos() - b.get_pos()) < 0)
 		overlap = -overlap;
 
-	
+	/*
 	if (a.get_immovable())
 		b.move(-overlap);
 	else if (b.get_immovable())
@@ -351,7 +362,7 @@ void collide(Shape& a, Shape& b, Collision_data cd) {
 		a.move( overlap * b.get_mass() / (a.get_mass() + b.get_mass()));
 		b.move(-overlap * a.get_mass() / (a.get_mass() + b.get_mass()));
 	}
-	
+	*/
 
 	//std::cout << "del_va = (" << del_va.x << ", " << del_va.y << ")\n";
 	//std::cout << "del_omega_a = " << del_omega_a << "\n";

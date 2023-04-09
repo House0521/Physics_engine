@@ -64,8 +64,6 @@ void Shape::set_color(sf::Color color) {
 	_color = color;
 }
 void Shape::set_e(float e) {
-	if (this->_immovable)
-		return;
 	_e = e;
 }
 void Shape::set_mass(float mass) {
@@ -131,12 +129,18 @@ bool Shape::get_immovable() {
 
 // move
 void Shape::move(sf::Vector2f vec) {
+	if (this->_immovable)
+		return;
 	this->_pos += vec;
 }
 void Shape::move(float x, float y) {
+	if (this->_immovable)
+		return;
 	this->_pos += sf::Vector2f(x, y);
 }
 void Shape::rotate(float theta) {
+	if (this->_immovable)
+		return;
 	this->_theta += theta;
 }
 

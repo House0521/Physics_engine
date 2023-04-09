@@ -45,7 +45,7 @@ private:
 	std::vector<Circle> points;
 
 	//Text
-	sf::Text cir_pos_text;
+	sf::Text total_E_text;
 	sf::Font font;
 
 public:

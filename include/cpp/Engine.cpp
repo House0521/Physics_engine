@@ -72,7 +72,7 @@ void Engine::init_objs() {
 	cirs.push_back(Circle());
 	cirs[0].set_radius(30.f);
 	cirs[0].set_pos(sf::Vector2f(50.f, 100.f));
-	cirs[0].set_v(sf::Vector2f(1000, 100));
+	cirs[0].set_v(sf::Vector2f(1000, 00));
 	
 
 	
@@ -86,10 +86,11 @@ void Engine::init_objs() {
 	// polygons
 	
 	std::vector<sf::Vector2f> points;
-	points.push_back(sf::Vector2f(0.0, 0.0));
-	points.push_back(sf::Vector2f(100.0, 0.0));
-	points.push_back(sf::Vector2f(100.0, 100.0));
-	points.push_back(sf::Vector2f(0.0, 100.0));
+	points.push_back(sf::Vector2f(0.f, 0.f));
+	points.push_back(sf::Vector2f(50.f, 0.f));
+	points.push_back(sf::Vector2f(50.f + 50.f / std::sqrt(2.f), 50.f / std::sqrt(2.f) + 50.f));
+	points.push_back(sf::Vector2f(50.f, 2.f * 50.f / std::sqrt(2.f) + 50.f));
+	points.push_back(sf::Vector2f(0.f, 2.f * 50.f / std::sqrt(2.f) + 50.f));
 	Polygon square(points);
 	square.rotate(PI / 3);
 	square.set_pos(300, 300);
@@ -109,10 +110,10 @@ void Engine::init_texts() {
 		system("pause");
 	}
 
-	this->cir_pos_text.setFont(font);
-	this->cir_pos_text.setCharacterSize(20);
-	cir_pos_text.setFillColor(sf::Color::White);
-	cir_pos_text.setPosition(10.f, 500.f);
+	this->total_E_text.setFont(font);
+	this->total_E_text.setCharacterSize(20);
+	total_E_text.setFillColor(sf::Color::White);
+	total_E_text.setPosition(10.f, 500.f);
 }
 
 //Constructors / Destructors
@@ -154,7 +155,7 @@ void Engine::update() {
 
 	this->resolve_collision();
 
-	//this->process_text();
+	this->process_text();
 
 
 	// step
@@ -206,7 +207,7 @@ void Engine::render() {
 		this->_window->draw(point.body());
 
 	//draw text
-	this->_window->draw(cir_pos_text);
+	this->_window->draw(total_E_text);
 
 	// display
 	this->_window->display();
@@ -290,17 +291,9 @@ void Engine::resolve_collision() {
 void Engine::process_text() {
 	//draw text
 	std::string s;
-	//s += "v = (" + std::to_string(cirs[0].get_v().x) + ", " + std::to_string(cirs[0].get_v().y) + ")\n";
 	s += "E = " + std::to_string(total_E()) + "\n";
 
-	// caculating deviation
-	/*
-	float theo = (float)1 / (float)2 * sfv_abs(cir->get_a()) * timer * timer;	// theoreical delta x
-	float deviation = theo - cir->get_pos().x;
-	s += ("\ncaculated x = " + std::to_string(theo));
-	s += (", deviation = " + std::to_string(deviation) + "(" + std::to_string(deviation / theo * (float)100) + " %)\n");
-	*/
-	cir_pos_text.setString(s);
+	total_E_text.setString(s);
 }
 
 //

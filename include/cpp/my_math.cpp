@@ -7,7 +7,7 @@ namespace sfv {
 	}
 
 	bool flt_equal(float a, float b) {
-		return std::abs(a - b) < DEVIATION;
+		return std::abs(a - b) < EPSILON;
 	}
 
 
@@ -17,7 +17,7 @@ namespace sfv {
 	}
 
 	bool flt_equal(const sf::Vector2f& u, const sf::Vector2f& v) {
-		return std::abs(u.x - v.x) < DEVIATION && std::abs(u.y - v.y) < DEVIATION;
+		return std::abs(u.x - v.x) < EPSILON && std::abs(u.y - v.y) < EPSILON;
 	}
 
 	float det(const sf::Vector2f& u, const sf::Vector2f& v) {
@@ -137,7 +137,7 @@ namespace sfv {
 			now = sfv::cross(va, vb);
 			if (last == 0)
 				continue;
-			if (static_cast<float>(last) * static_cast<float>(now) >= 0)	// both positive or both negative
+			if ((last) * (now) >= 0)	// both positive or both negative
 				continue;
 			if (last * now <= 0)
 				return false;
